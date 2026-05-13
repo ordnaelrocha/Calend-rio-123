@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity Calendar 2026 - Manual Alarm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p-blue: #60a5fa; --p-green: #4ade80; --p-purple: #c084fc;
+            --p-orange: #fb923c; --p-red: #f87171; --p-pink: #f472b6;
+            --holiday: #fbbf24; --bg: #f8fafc; --mp-blue: #009ee3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); min-height: 100vh; display: flex; justify-content: center; padding: 20px; color: #1e293b; }
+        .app-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 20px; }
+
+        .calendar-card {
+            background: white; border-radius: 30px; padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .nav-btn { background: #f1f5f9; border: none; width: 35px; height: 35px; border-radius: 12px; cursor: pointer; font-weight: 800; }
+
+        /* Semanas em Destaque */
+        .weekday { 
+            text-align: center; font-size: 11px; font-weight: 900; color: #1e293b; 
+            text-transform: uppercase; letter-spacing: 1.8px; padding-bottom: 15px; 
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day { 
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer;
+            background: #fff; transition: 0.2s; position: relative; border: 1px solid #f1f5f9;
+        }
+        .day.is-holiday { border: 2.5px solid var(--holiday) !important; color: #b45309; }
+        .day.selected { outline: 2.5px solid #000; outline-offset: -2.5px; z-index: 2; }
+
+        /* Cores Dinâmicas */
+        .sel-blue { background: var(--p-blue) !important; color: white !important; }
+        .sel-green { background: var(--p-green) !important; color: white !important; }
+        .sel-purple { background: var(--p-purple) !important; color: white !important; }
+        .sel-orange { background: var(--p-orange) !important; color: white !important; }
+        .sel-red { background: var(--p-red) !important; color: white !important; }
+        .sel-pink { background: var(--p-pink) !important; color: white !important; }
+
+        .has-note-dot { width: 5px; height: 5px; background: currentColor; border-radius: 50%; position: absolute; bottom: 5px; opacity: 0.7; }
+
+        .details-card {
+            background: white; border-radius: 30px; padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .alarm-section {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f1f5f9; padding: 12px 18px; border-radius: 18px; margin-bottom: 15px;
+        }
+
+        .time-picker {
+            border: none; background: white; padding: 5px 10px; border-radius: 10px;
+            font-weight: 800; font-size: 16px; color: var(--mp-blue); outline: none;
+        }
+
+        .holiday-badge {
+            display: inline-block; background: #fef3c7; color: #b45309; 
+            font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 8px; margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%; border: none; background: #f8fafc; border-radius: 20px;
+            padding: 18px; font-size: 15px; min-height: 120px; outline: none;
+            color: #1e293b; line-height: 1.6; resize: none; font-weight: 500;
+        }
+
+        .theme-hub { display: flex; justify-content: space-between; margin-bottom: 20px; background: #f8fafc; padding: 10px; border-radius: 20px; }
+        .dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
+        .dot.active { transform: scale(1.1); border-color: #000; }
+
+        .mp-btn {
+            background: var(--mp-blue); color: white; text-align: center; padding: 15px;
+            border-radius: 20px; text-decoration: none; font-weight: 800; display: block; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="calendar-card">
+        <div class="month-header">
+            <button class="nav-btn" onclick="changeMonth(-1)">←</button>
+            <h2 id="month-name" style="font-weight: 800; font-size: 20px;">Janeiro 2026</h2>
+            <button class="nav-btn" onclick="changeMonth(1)">→</button>
+        </div>
+
+        <div class="theme-hub">
+            <div class="dot active" style="background: var(--p-blue)" onclick="setTheme('blue', this)"></div>
+            <div class="dot" style="background: var(--p-green)" onclick="setTheme('green', this)"></div>
+            <div class="dot" style="background: var(--p-purple)" onclick="setTheme('purple', this)"></div>
+            <div class="dot" style="background: var(--p-orange)" onclick="setTheme('orange', this)"></div>
+            <div class="dot" style="background: var(--p-red)" onclick="setTheme('red', this)"></div>
+            <div class="dot" style="background: var(--p-pink)" onclick="setTheme('pink', this)"></div>
+        </div>
+
+        <div id="calendar" class="grid"></div>
+    </div>
+
+    <div class="details-card">
+        <div id="holiday-info" class="holiday-badge" style="display:none;"></div>
+        <h3 id="selected-date-text" style="font-weight: 800; margin-bottom: 15px; font-size: 18px;">Toque em um dia</h3>
+        
+        <div class="alarm-section">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">⏰</span>
+                <span style="font-weight: 700; font-size: 13px;">Definir Alarme:</span>
+            </div>
+            <!-- ALARME COMEÇA VAZIO (ZERADO) -->
+            <input type="time" id="alarm-time" class="time-picker" onchange="syncWithKodular()" disabled>
+        </div>
+
+        <textarea id="note-input" placeholder="Escreva um lembrete..." oninput="syncWithKodular()" disabled></textarea>
+    </div>
+
+    <a href="SEU_LINK_MERCADO_PAGO" class="mp-btn">Apoiar com Mercado Pago</a>
+</div>
+
+<script>
+    const holidays2026 = {
+        "0-1": "Confraternização Universal", "1-16": "Carnaval", "1-17": "Carnaval", "1-18": "Quarta-feira de Cinzas",
+        "3-3": "Sexta-feira Santa", "3-5": "Páscoa", "3-21": "Tiradentes", "4-1": "Dia do Trabalho",
+        "5-4": "Corpus Christi", "8-7": "Independência do Brasil", "9-12": "Nossa Sra. Aparecida", 
+        "10-2": "Finados", "10-15": "Proclamação da República", "10-20": "Consciência Negra", "11-25": "Natal"
+    };
+
+    let currentMonth = new Date().getMonth();
+    let selectedColor = 'blue';
+    let data = JSON.parse(localStorage.getItem('inf_cal_v15')) || {};
+    let activeKey = null;
+
+    function render() {
+        const grid = document.getElementById('calendar');
+        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        document.getElementById('month-name').innerText = `${months[currentMonth]} 2026`;
+        grid.innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="weekday">${d}</div>`).join('');
+
+        const firstDay = new Date(2026, currentMonth, 1).getDay();
+        const daysInMonth = new Date(2026, currentMonth + 1, 0).getDate();
+
+        for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
+
+        for(let d=1; d<=daysInMonth; d++) {
+            const key = `${currentMonth}-${d}`;
+            
+            // Garantir que os dias novos iniciem totalmente limpos (zerados)
+            if(!data[key]) {
+                data[key] = { color: null, note: "", alarm: "" };
+            }
+            
+            const isHoliday = holidays2026[key];
+            const entry = data[key];
+            
+            const dayEl = document.createElement('div');
+            dayEl.className = `day ${entry.color ? 'sel-'+entry.color : ''} ${isHoliday ? 'is-holiday' : ''} ${activeKey === key ? 'selected' : ''}`;
+            dayEl.innerHTML = `${d}${entry.note ? '<div class="has-note-dot"></div>' : ''}`;
+            
+            dayEl.onclick = () => {
+                data[key].color = (data[key].color === selectedColor) ? null : selectedColor;
+                activeKey = key;
+                openDay(d, key, isHoliday);
+                save();
+            };
+            grid.appendChild(dayEl);
+        }
+    }
+
+    function openDay(day, key, holidayName) {
+        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        document.getElementById('selected-date-text').innerText = `${day} de ${months[currentMonth]}`;
+        
+        const hInfo = document.getElementById('holiday-info');
+        hInfo.style.display = holidayName ? "inline-block" : "none";
+        if(holidayName) hInfo.innerText = `🎉 ${holidayName}`;
+
+        const noteField = document.getElementById('note-input');
+        const timeField = document.getElementById('alarm-time');
+        
+        noteField.disabled = false;
+        timeField.disabled = false;
+        
+        noteField.value = data[key].note || "";
+        timeField.value = data[key].alarm || ""; // Alarme vem vazio se não foi definido
+    }
+
+    function syncWithKodular() {
+        if(!activeKey) return;
+        data[activeKey].note = document.getElementById('note-input').value;
+        data[activeKey].alarm = document.getElementById('alarm-time').value;
+        save();
+
+        // Envia para o Kodular apenas se houver um horário definido
+        if(window.AppInventor) {
+            const msg = `${activeKey}|${data[activeKey].alarm}|${data[activeKey].note}`;
+            window.AppInventor.setWebViewString(msg);
+        }
+    }
+
+    function save() {
+        localStorage.setItem('inf_cal_v15', JSON.stringify(data));
+        render();
+    }
+
+    function changeMonth(dir) {
+        currentMonth += dir;
+        if(currentMonth < 0) currentMonth = 11;
+        if(currentMonth > 11) currentMonth = 0;
+        render();
+    }
+
+    function setTheme(color, el) {
+        selectedColor = color;
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    render();
+</script>
+</body>
+</html>

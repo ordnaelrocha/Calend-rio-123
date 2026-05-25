@@ -2,280 +2,439 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinity Calendar 2026 - Glassmorphism Innovation</title>
-    <!-- Importação da Fonte Inter (Padrão UI Premium) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Infinity Calendar 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
+        /* Variáveis de Cores dos Temas */
         :root {
-            /* Cores Neon Suaves para contraste no tema escuro */
-            --p-blue: #3b82f6; --p-green: #10b981; --p-purple: #a855f7;
-            --p-orange: #f97316; --p-red: #ef4444; --p-pink: #ec4899;
-            --holiday: #f59e0b; 
-            --bg: #090d16; /* Fundo Deep Space/OLED */
-            --card-bg: rgba(255, 255, 255, 0.04); /* Efeito Vidro */
-            --card-border: rgba(255, 255, 255, 0.07);
-            --text-main: #f8fafc;
+            --bg: #f0f4fa;
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --card-bg: white;
+            --card-border: 1px solid rgba(0,0,0,0.06);
+            --card-shadow: 0 2px 20px rgba(15,23,42,0.06);
+            --text-main: #0f172a;
             --text-muted: #94a3b8;
-            --mp-blue: #009ee3;
+            --input-bg: #f8fafc;
+            --input-bg-edit: white;
+            --event-bg: #fef9ec;
+            --event-fg: #b45309;
+            --event-border: 1px solid #fcd34d;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body.theme-green {
+            --primary: #059669; --primary-light: #ecfdf5; --bg: #f0f7f4;
+        }
+        body.theme-purple {
+            --primary: #7c3aed; --primary-light: #f5f3ff; --bg: #f3f1fb;
+        }
+        body.theme-black {
+            --primary: #38bdf8;
+            --primary-light: #1e293b;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: 1px solid #334155;
+            --card-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --text-main: #f8fafc;
+            --text-muted: #64748b;
+            --input-bg: #0f172a;
+            --input-bg-edit: #1e293b;
+            --event-bg: #3f2b11;
+            --event-fg: #fcd34d;
+            --event-border: 1px solid #78350f;
+        }
+
+        /* Cores Fixas para Marcação de Datas (Independente do Tema) */
+        .m-red { background-color: #ef4444 !important; color: white !important; }
+        .m-yellow { background-color: #eab308 !important; color: #451a03 !important; }
+        .m-green { background-color: #22c55e !important; color: white !important; }
+        .m-blue { background-color: #3b82f6 !important; color: white !important; }
+        .m-purple { background-color: #a855f7 !important; color: white !important; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DM Sans', 'Segoe UI', sans-serif; }
         
-        /* Centralização e Efeito de Iluminação de Fundo */
         body { 
             background: var(--bg); 
-            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
             min-height: 100vh; 
             display: flex; 
             justify-content: center; 
-            align-items: center; 
-            padding: 16px; 
-            color: var(--text-main); 
+            padding: 20px 16px 40px;
+            transition: background 0.3s ease;
         }
         
-        .app-container { 
-            width: 100%; 
-            max-width: 400px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 18px; 
-            justify-content: center;
+        .app-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+
+        /* Header */
+        .app-header { text-align: center; padding: 8px 0 4px; }
+        .app-header h1 { font-size: 22px; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; transition: color 0.3s; }
+        .app-header .year { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+        /* Seletor de Temas */
+        .theme-selector { background: var(--card-bg); border-radius: 16px; padding: 8px; border: var(--card-border); display: flex; gap: 6px; transition: all 0.3s; }
+        .theme-btn {
+            flex: 1; padding: 8px 4px; border-radius: 10px; border: 2px solid transparent;
+            background: transparent; color: var(--text-muted); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s;
         }
+        .theme-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 
-        /* Estilo Inovador de Vidro Espelhado */
-        .calendar-card {
-            background: var(--card-bg); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px; 
-            padding: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
-            border: 1px solid var(--card-border);
+        /* Cards Gerais */
+        .card { background: var(--card-bg); border-radius: 24px; padding: 20px; box-shadow: var(--card-shadow); border: var(--card-border); transition: all 0.3s ease; }
+
+        /* Navegação do Mês */
+        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .nav-btn {
+            background: var(--input-bg); border: none; width: 38px; height: 38px; border-radius: 50%;
+            cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; font-weight: 700;
+            color: var(--text-main); transition: all 0.2s;
         }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .month-title { font-weight: 800; font-size: 19px; text-align: center; color: var(--text-main); }
+        .month-sub { font-size: 11px; text-align: center; color: var(--primary); font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Cabeçalho Limpo e Futurista */
-        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .month-header h2 { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: var(--text-main); text-align: center; flex-grow: 1; }
-        .nav-btn { background: rgba(255,255,255,0.06); border: none; color: var(--text-main); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 15px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
-        .nav-btn:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
-
-        /* Dias da Semana Minimalistas */
-        .weekday { 
-            text-align: center; font-size: 11px; font-weight: 800; color: var(--text-muted); 
-            text-transform: uppercase; letter-spacing: 1.5px; padding-bottom: 12px; 
-        }
-
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        /* Grade do Calendário */
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .weekday { text-align: center; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; padding-bottom: 8px; }
         
-        /* Botões de Dias Circulares Estilo Display Nativos */
-        .day { 
+        .day {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; font-size: 14px; font-weight: 600; cursor: pointer;
-            background: transparent; transition: 0.2s; position: relative; border: 1px solid transparent;
-            color: #cbd5e1;
+            border-radius: 50%; font-size: 13px; font-weight: 600; cursor: pointer;
+            position: relative; color: var(--text-main); border: 1px solid transparent; transition: all 0.15s; user-select: none;
         }
-        .day:hover { background: rgba(255,255,255,0.03); }
-        .day.is-holiday { border: 1.5px solid var(--holiday) !important; color: var(--holiday); font-weight: 700; }
-        .day.selected { outline: 2px solid var(--text-main); outline-offset: -2px; z-index: 2; font-weight: 800; }
+        .day.sunday { color: #f87171; }
+        .day.event-day { background: var(--event-bg); color: var(--event-fg); border: var(--event-border); font-weight: 700; }
+        .day.active-focus { background: var(--primary-light); outline: 2px solid var(--primary); outline-offset: 2px; }
+        
+        .note-dot { width: 4px; height: 4px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 3px; }
+        .day[class*="m-"] .note-dot { background: rgba(255,255,255,0.8); }
 
-        /* Cores de Seleção com brilho neon suave (Glow) */
-        .sel-blue { background: var(--p-blue) !important; color: white !important; box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
-        .sel-green { background: var(--p-green) !important; color: white !important; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .sel-purple { background: var(--p-purple) !important; color: white !important; box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
-        .sel-orange { background: var(--p-orange) !important; color: white !important; box-shadow: 0 0 12px rgba(249, 115, 22, 0.4); }
-        .sel-red { background: var(--p-red) !important; color: white !important; box-shadow: 0 0 12px rgba(239, 68, 44, 0.4); }
-        .sel-pink { background: var(--p-pink) !important; color: white !important; box-shadow: 0 0 12px rgba(236, 72, 153, 0.4); }
-
-        .has-note-dot { width: 4px; height: 4px; background: currentColor; border-radius: 50%; position: absolute; bottom: 5px; }
-
-        /* Painel de Detalhes Inferior */
-        .details-card {
-            background: var(--card-bg); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px; 
-            padding: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
-            border: 1px solid var(--card-border);
-            text-align: center;
+        /* Seletor de Cores de Datas */
+        .color-picker { display: flex; gap: 8px; align-items: center; margin-top: 5px; }
+        .marker-dot {
+            width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+            transition: transform 0.1s; position: relative;
         }
+        .marker-dot:hover { transform: scale(1.1); }
+        .marker-dot.selected { border-color: var(--text-main); transform: scale(1.15); }
+        .marker-dot.none-color { background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #64748b; }
+        body.theme-black .marker-dot.none-color { background: #334155; color: #94a3b8; }
 
-        .details-card h3 { font-weight: 700; margin-bottom: 14px; font-size: 19px; letter-spacing: -0.3px; color: var(--text-main); }
-
-        /* Etiqueta de Feriado Fluida */
-        .holiday-badge {
-            display: inline-block; background: rgba(245, 158, 11, 0.12); color: var(--holiday); 
-            font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; margin-bottom: 12px;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            white-space: pre-line; /* Permite quebras de linha na badge caso acumule mais de um evento */
+        /* Detalhes */
+        .event-badge {
+            background: var(--event-bg); color: var(--event-fg); font-size: 11px; font-weight: 700;
+            padding: 6px 14px; border-radius: 20px; margin-bottom: 12px;
+            display: inline-block; white-space: pre-line; border: var(--event-border); line-height: 1.6;
         }
+        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .details-title { font-weight: 800; font-size: 17px; color: var(--text-main); }
+        .details-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
+        
+        .actions-div { display: flex; gap: 6px; align-items: center; }
+        .action-btn {
+            background: var(--input-bg); border: var(--card-border); border-radius: 12px; 
+            padding: 7px 11px; font-size: 14px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-weight: 700;
+        }
+        .action-btn.active-btn { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* Input Invisível com Borda Neon sutil ao focar */
         textarea {
-            width: 100%; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); border-radius: 18px;
-            padding: 16px; font-size: 15px; min-height: 120px; outline: none;
-            color: var(--text-main); line-height: 1.5; resize: none; font-weight: 400;
-            text-align: left; transition: 0.3s;
+            width: 100%; border: 1px solid var(--card-border); background: var(--input-bg);
+            border-radius: 14px; padding: 14px; font-size: 14px; min-height: 100px; outline: none; color: var(--text-main);
+            resize: none; line-height: 1.6; transition: all 0.2s;
         }
-        textarea:focus { border-color: rgba(255,255,255,0.25); background: rgba(0,0,0,0.35); }
-        textarea::placeholder { color: #475569; }
+        textarea:focus { border-color: var(--primary); background: var(--input-bg-edit); }
+        textarea:disabled { opacity: 0.5; }
 
-        /* Bolhas de Seleção de Cores Minimalistas */
-        .theme-hub { display: flex; justify-content: space-between; margin-bottom: 18px; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 20px; }
-        .dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
-        .dot.active { transform: scale(1.15); border-color: var(--text-main); }
-
-        /* Botão Mercado Pago Futurista */
+        /* Mercado Pago */
         .mp-btn {
-            background: linear-gradient(135deg, #009ee3, #007bb5); color: white; text-align: center; padding: 16px;
-            border-radius: 20px; text-decoration: none; font-weight: 700; display: block; 
-            font-size: 15px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 158, 227, 0.25);
+            background: linear-gradient(135deg, #009ee3 0%, #0070a0 100%);
+            color: white; text-align: center; padding: 15px;
+            border-radius: 18px; text-decoration: none; font-weight: 700;
+            display: block; font-size: 14px; letter-spacing: 0.3px;
+            box-shadow: 0 4px 16px rgba(0,158,227,0.35); transition: all 0.3s;
         }
-        .mp-btn:active { transform: scale(0.98); opacity: 0.95; }
+        body.theme-black .mp-btn { box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="calendar-card">
+    <!-- Header -->
+    <div class="app-header">
+        <h1>Infinity Calendar</h1>
+        <div class="year">2026</div>
+    </div>
+
+    <!-- Seletor de Temas -->
+    <div class="theme-selector">
+        <button class="theme-btn active" id="btn-blue" onclick="setTheme('blue')">🔵 Azul</button>
+        <button class="theme-btn" id="btn-green" onclick="setTheme('green')">🟢 Verde</button>
+        <button class="theme-btn" id="btn-purple" onclick="setTheme('purple')">🟣 Roxo</button>
+        <button class="theme-btn" id="btn-black" onclick="setTheme('black')">⚫ Preto</button>
+    </div>
+
+    <!-- Calendário -->
+    <div class="card">
         <div class="month-header">
-            <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
-            <h2 id="month-name">Janeiro 2026</h2>
-            <button class="nav-btn" onclick="changeMonth(1)">›</button>
+            <button class="nav-btn" id="prev-btn" onclick="changeMonth(-1)">‹</button>
+            <div>
+                <div class="month-title" id="month-display">Janeiro</div>
+                <div class="month-sub">2026</div>
+            </div>
+            <button class="nav-btn" id="next-btn" onclick="changeMonth(1)">›</button>
         </div>
 
-        <div class="theme-hub">
-            <div class="dot active" style="background: var(--p-blue)" onclick="setTheme('blue', this)"></div>
-            <div class="dot" style="background: var(--p-green)" onclick="setTheme('green', this)"></div>
-            <div class="dot" style="background: var(--p-purple)" onclick="setTheme('purple', this)"></div>
-            <div class="dot" style="background: var(--p-orange)" onclick="setTheme('orange', this)"></div>
-            <div class="dot" style="background: var(--p-red)" onclick="setTheme('red', this)"></div>
-            <div class="dot" style="background: var(--p-pink)" onclick="setTheme('pink', this)"></div>
+        <div class="grid" id="calendar-grid"></div>
+    </div>
+
+    <!-- Detalhes -->
+    <div class="card">
+        <div id="badge-zone"></div>
+        
+        <div class="details-header">
+            <div>
+                <div class="details-title" id="details-date-title">Toque em um dia</div>
+                <div class="details-sub" id="details-day-name"></div>
+            </div>
+            <div class="actions-div">
+                <!-- Seletor de Cores de Marcação Interno -->
+                <div class="color-picker" id="date-color-picker" style="display: none;">
+                    <div class="marker-dot none-color" onclick="setDateColor(false)" title="Remover cor">✕</div>
+                    <div class="marker-dot m-red" onclick="setDateColor('red')"></div>
+                    <div class="marker-dot m-yellow" onclick="setDateColor('yellow')"></div>
+                    <div class="marker-dot m-green" onclick="setDateColor('green')"></div>
+                    <div class="marker-dot m-blue" onclick="setDateColor('blue')"></div>
+                    <div class="marker-dot m-purple" onclick="setDateColor('purple')"></div>
+                </div>
+                <button class="action-btn" id="lock-btn" onclick="toggleLock()" title="Bloquear/Desbloquear" disabled>🔒</button>
+            </div>
         </div>
 
-        <div id="calendar" class="grid"></div>
+        <textarea id="note-input" disabled placeholder="Selecione um dia..." oninput="handleNoteChange(this.value)"></textarea>
+        <div id="saving-text" style="font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; display: none;">Salvando automaticamente…</div>
     </div>
 
-    <div class="details-card">
-        <div id="holiday-info" class="holiday-badge" style="display:none;"></div>
-        <h3 id="selected-date-text">Toque em um dia</h3>
-
-        <textarea id="note-input" placeholder="Escreva um lembrete..." oninput="syncWithKodular()" disabled></textarea>
-    </div>
-
-    <a href="SEU_LINK_MERCADO_PAGO" class="mp-btn">Apoiar com Mercado Pago</a>
+    <!-- Link Mercado Pago -->
+    <a href="SEU_LINK_MERCADO_PAGO" class="mp-btn">💙 Apoiar com Mercado Pago</a>
 </div>
 
 <script>
-    const holidays2026 = {
+    const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const WEEKDAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+    const HOLIDAYS = {
         "0-1": "Confraternização Universal", "1-16": "Carnaval", "1-17": "Carnaval", "1-18": "Quarta-feira de Cinzas",
         "3-3": "Sexta-feira Santa", "3-5": "Páscoa", "3-21": "Tiradentes", "4-1": "Dia do Trabalho",
-        "5-4": "Corpus Christi", "8-7": "Independência do Brasil", "9-12": "Nossa Sra. Aparecida", 
+        "5-4": "Corpus Christi", "8-7": "Independência do Brasil", "9-12": "Nossa Sra. Aparecida",
         "10-2": "Finados", "10-15": "Proclamação da República", "10-20": "Consciência Negra", "11-25": "Natal"
     };
 
-    let currentMonth = new Date().getMonth();
-    let selectedColor = 'blue';
-    let data = JSON.parse(localStorage.getItem('inf_cal_v19')) || {};
-    let activeKey = null;
+    const AUTO_EVENTS = {
+        4: "Reunião às 19:30",
+        0: "Serviço de campo às 09:00\nReunião às 18:00"
+    };
 
-    function render() {
-        const grid = document.getElementById('calendar');
-        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        document.getElementById('month-name').innerText = `${months[currentMonth]} 2026`;
-        grid.innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="weekday">${d}</div>`).join('');
+    let currentMonth = new Date().getMonth();
+    let currentTheme = "blue";
+    let appData = {};
+    let activeKey = null;
+    let isLocked = true;
+
+    try {
+        const savedData = localStorage.getItem("ical_data");
+        if (savedData) appData = JSON.parse(savedData);
+        const savedTheme = localStorage.getItem("ical_theme");
+        if (savedTheme) currentTheme = savedTheme;
+    } catch(e) {}
+
+    function setTheme(themeKey) {
+        currentTheme = themeKey;
+        document.body.className = "";
+        if (themeKey !== "blue") document.body.classList.add("theme-" + themeKey);
+        
+        document.querySelectorAll(".theme-btn").forEach(btn => btn.classList.remove("active"));
+        document.getElementById("btn-" + themeKey).classList.add("active");
+        
+        try { localStorage.setItem("ical_theme", themeKey); } catch(e) {}
+        renderCalendar();
+        updateDetailsSection();
+    }
+
+    function getDow(m, d) { return new Date(2026, m, d).getDay(); }
+    function getAutoNote(m, d) { return AUTO_EVENTS[getDow(m, d)] || ""; }
+
+    function getEventText(m, d) {
+        const key = `${m}-${d}`;
+        const dow = getDow(m, d);
+        const parts = [];
+        if (HOLIDAYS[key]) parts.push(HOLIDAYS[key]);
+        if (AUTO_EVENTS[dow]) parts.push(AUTO_EVENTS[dow]);
+        return parts.join("\n");
+    }
+
+    function renderCalendar() {
+        document.getElementById("month-display").innerText = MONTHS[currentMonth];
+        document.getElementById("prev-btn").disabled = currentMonth === 0;
+        document.getElementById("next-btn").disabled = currentMonth === 11;
+
+        const grid = document.getElementById("calendar-grid");
+        grid.innerHTML = "";
+
+        WEEKDAYS.forEach(d => {
+            const div = document.createElement("div");
+            div.className = "weekday";
+            div.innerText = d;
+            grid.appendChild(div);
+        });
 
         const firstDay = new Date(2026, currentMonth, 1).getDay();
         const daysInMonth = new Date(2026, currentMonth + 1, 0).getDate();
 
-        for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
+        for (let i = 0; i < firstDay; i++) {
+            grid.appendChild(document.createElement("div"));
+        }
 
-        for(let d=1; d<=daysInMonth; d++) {
+        for (let d = 1; d <= daysInMonth; d++) {
             const key = `${currentMonth}-${d}`;
-            const dateObj = new Date(2026, currentMonth, d);
-            const dayOfWeek = dateObj.getDay(); // 0 = Domingo, 4 = Quinta-feira
+            const dow = getDow(currentMonth, d);
+            const isEvent = !!HOLIDAYS[key] || dow === 0 || dow === 4;
+            const isActive = activeKey === key;
+            const isSunday = dow === 0;
+            
+            const entry = appData[key] || { color: false, note: "" };
 
-            // Injeta as reuniões recorrentes na memória caso o dia esteja limpo
-            if(!data[key]) {
-                let autoNote = "";
-                if(dayOfWeek === 4) autoNote = "Reunião às 19:30";
-                if(dayOfWeek === 0) autoNote = "Serviço de campo às 09:00\nReunião às 18:00";
-                data[key] = { color: null, note: autoNote };
-            }
+            const dayDiv = document.createElement("div");
+            dayDiv.className = "day";
+            dayDiv.innerText = d;
+
+            if (isSunday) dayDiv.classList.add("sunday");
+            if (isEvent) dayDiv.classList.add("event-day");
+            if (isActive) dayDiv.classList.add("active-focus");
             
-            // Lógica para combinar feriados estruturados com as reuniões automáticas
-            let eventText = holidays2026[key] || "";
-            if(dayOfWeek === 4) {
-                eventText = eventText ? eventText + " | Reunião às 19:30" : "Reunião às 19:30";
-            }
-            if(dayOfWeek === 0) {
-                const domEvents = "Serviço de campo às 09:00 / Reunião às 18:00";
-                eventText = eventText ? eventText + " | " + domEvents : domEvents;
+            // Aplica a classe de cor customizada se ela existir
+            if (entry.color) {
+                dayDiv.classList.add("m-" + entry.color);
             }
 
-            const isHolidayOrEvent = eventText !== "";
-            const entry = data[key];
-            
-            const dayEl = document.createElement('div');
-            // Se tiver reunião ou feriado, ganha a borda dourada estilizada
-            dayEl.className = `day ${entry.color ? 'sel-'+entry.color : ''} ${isHolidayOrEvent ? 'is-holiday' : ''} ${activeKey === key ? 'selected' : ''}`;
-            dayEl.innerHTML = `${d}${entry.note ? '<div class="has-note-dot"></div>' : ''}`;
-            
-            dayEl.onclick = () => {
-                data[key].color = (data[key].color === selectedColor) ? null : selectedColor;
-                activeKey = key;
-                openDay(d, key, eventText);
-                save();
-            };
-            grid.appendChild(dayEl);
+            if (entry.note) {
+                const dot = document.createElement("div");
+                dot.className = "note-dot";
+                dayDiv.appendChild(dot);
+            }
+
+            dayDiv.onclick = () => selectDay(d);
+            grid.appendChild(dayDiv);
         }
-    }
-
-    function openDay(day, key, holidayName) {
-        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        document.getElementById('selected-date-text').innerText = `${day} de ${months[currentMonth]}`;
-        
-        const hInfo = document.getElementById('holiday-info');
-        hInfo.style.display = holidayName ? "inline-block" : "none";
-        if(holidayName) hInfo.innerText = `📢 ${holidayName}`;
-
-        const noteField = document.getElementById('note-input');
-        noteField.disabled = false;
-        noteField.value = data[key].note || "";
-    }
-
-    function syncWithKodular() {
-        if(!activeKey) return;
-        data[activeKey].note = document.getElementById('note-input').value;
-        save();
-
-        if(window.AppInventor) {
-            const msg = `${activeKey}|${data[activeKey].note}`;
-            window.AppInventor.setWebViewString(msg);
-        }
-    }
-
-    function save() {
-        localStorage.setItem('inf_cal_v19', JSON.stringify(data));
-        render();
     }
 
     function changeMonth(dir) {
         currentMonth += dir;
-        if(currentMonth < 0) currentMonth = 11;
-        if(currentMonth > 11) currentMonth = 0;
-        render();
+        activeKey = null;
+        isLocked = true;
+        renderCalendar();
+        updateDetailsSection();
     }
 
-    function setTheme(color, el) {
-        selectedColor = color;
-        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
-        el.classList.add('active');
+    function selectDay(d) {
+        activeKey = `${currentMonth}-${d}`;
+        isLocked = true;
+        renderCalendar();
+        updateDetailsSection();
     }
 
-    render();
+    function updateDetailsSection() {
+        const lockBtn = document.getElementById("lock-btn");
+        const noteInput = document.getElementById("note-input");
+        const badgeZone = document.getElementById("badge-zone");
+        const colorPicker = document.getElementById("date-color-picker");
+
+        if (!activeKey) {
+            document.getElementById("details-date-title").innerText = "Toque em um dia";
+            document.getElementById("details-day-name").innerText = "";
+            lockBtn.disabled = true; lockBtn.innerText = "🔒"; lockBtn.className = "action-btn";
+            noteInput.disabled = true; noteInput.value = ""; noteInput.placeholder = "Selecione um dia...";
+            badgeZone.innerHTML = "";
+            colorPicker.style.display = "none";
+            return;
+        }
+
+        const d = parseInt(activeKey.split("-")[1]);
+        document.getElementById("details-date-title").innerText = `${d} de ${MONTHS[currentMonth]}`;
+        document.getElementById("details-day-name").innerText = WEEKDAYS[getDow(currentMonth, d)];
+
+        const entry = appData[activeKey] || { color: false, note: "" };
+        
+        // Exibe o seletor de cores das datas
+        colorPicker.style.display = "flex";
+        document.querySelectorAll(".marker-dot").forEach(dot => dot.classList.remove("selected"));
+        if (!entry.color) {
+            document.querySelector(".none-color").classList.add("selected");
+        } else {
+            const selectedDot = document.querySelector(".marker-dot.m-" + entry.color);
+            if (selectedDot) selectedDot.classList.add("selected");
+        }
+
+        // Atualiza Cadeado
+        lockBtn.disabled = false;
+        if (isLocked) {
+            lockBtn.innerText = "🔒";
+            lockBtn.className = "action-btn";
+            noteInput.disabled = true;
+            noteInput.placeholder = "Toque em 🔓 para editar...";
+        } else {
+            lockBtn.innerText = "🔓";
+            lockBtn.className = "action-btn active-btn";
+            noteInput.disabled = false;
+            noteInput.placeholder = "Escreva aqui sua nota...";
+        }
+
+        noteInput.value = entry.note !== undefined && entry.note !== "" ? entry.note : getAutoNote(currentMonth, d);
+
+        const eventText = getEventText(currentMonth, d);
+        if (eventText) {
+            badgeZone.innerHTML = `<div class="event-badge">📢 ${eventText.replace(/\n/g, '<br>')}</div>`;
+        } else {
+            badgeZone.innerHTML = "";
+        }
+    }
+
+    function setDateColor(colorName) {
+        if (!activeKey) return;
+        if (!appData[activeKey]) appData[activeKey] = { color: false, note: "" };
+        
+        appData[activeKey].color = colorName; // Salva o nome da cor (red, yellow, etc) ou false
+        saveData();
+        renderCalendar();
+        updateDetailsSection();
+    }
+
+    function toggleLock() {
+        if (!activeKey) return;
+        isLocked = !isLocked;
+        updateDetailsSection();
+        if (!isLocked) document.getElementById("note-input").focus();
+    }
+
+    function handleNoteChange(val) {
+        if (!activeKey || isLocked) return;
+        if (!appData[activeKey]) appData[activeKey] = { color: false, note: "" };
+        appData[activeKey].note = val;
+        
+        document.getElementById("saving-text").style.display = "block";
+        saveData();
+        
+        setTimeout(() => {
+            document.getElementById("saving-text").style.display = "none";
+        }, 500);
+    }
+
+    function saveData() {
+        try { localStorage.setItem("ical_data", JSON.stringify(appData)); } catch(e) {}
+    }
+
+    window.onload = function() {
+        setTheme(currentTheme);
+    };
 </script>
 </body>
 </html>
-
